@@ -27,13 +27,13 @@
 #'   `TRUE` all runs will produce an output). Defaults to 1.
 #' @param t_inic A numeric giving the initial temperature. Must be greater
 #'   than 0 and maximum admitted value is 1. Defaults to 0.3.
-#' @param t_final A numeric giving the initial temperature. Must be bounded
+#' @param t_final A numeric giving the final temperature. Must be bounded
 #'   between 0 and 1. Usually very low values are needed to ensure convergence.
 #'   Defaults to 0.000001.
 #' @param alpha A numeric giving the fraction of temperature drop to be used
 #'   in the temperature reduction scheme (see Details). Must be bounded between
 #'   0 and 1. Defaults to 0.05.
-#' @param n_iter A numeric giving the initial temperature. Defaults to 1000.
+#' @param n_iter A numeric giving the number of iterations. Defaults to 1000.
 #' @param use_grasp A logical. Defaults to `TRUE`. IF `TRUE`, a GRASP is used
 #'   to obtain the initial partitions for the Simulated Annealing. If `FALSE`
 #'   the user should provide an initial partition or use or use
@@ -48,16 +48,16 @@
 #'
 #' @details Given a phytosociological table (`m_bin`, with rows corresponding to
 #'   taxa and columns corresponding to relevés) this function searches for a
-#'   `k`-partition (`k`, defined by the user) optimizing TDV, i.e., searches,
-#'   using a SANN algorithm (optionally working upon GRASP solutions), for the
-#'   global maximum of TDV (by rearranging the relevés into `k` groups).
+#'   `k`-partition (`k`, defined by the user) optimizing the TDV, i.e.,
+#'   searches, using a SANN algorithm (optionally working upon GRASP solutions),
+#'   for a global maximum of TDV (by rearranging the relevés into `k` groups).
 #'
 #'   This function uses two main algorithms:
 #'
 #'   1) An optional GRASP, which is used to obtain initial solutions
 #'   (partitions of `m_bin`) using function [partition_tdv_grasp()].
 #'   Such initial solutions are then submitted to the SANN algorithm.
-#'   2) The (main) SANN algorithm, which is used to search for the global
+#'   2) The (main) SANN algorithm, which is used to search for a global
 #'   maximum of TDV. The initial partition for each run of SANN can be a
 #'   partition obtained from GRASP (if `use_grasp = TRUE`) or, (if
 #'   `use_grasp = FALSE`), a partition given by the user (using `p_initial`) or
@@ -182,7 +182,7 @@
 #' plot(
 #'   result[["SANN"]][[1]]$current.tdv,
 #'   type = "l",
-#'   xlab = "Run number",
+#'   xlab = "Iteration number",
 #'   ylab = "TDV of the currently accepted solution"
 #' )
 #' for (run in 2:length(result[["SANN"]])) {

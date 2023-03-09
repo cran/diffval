@@ -6,8 +6,8 @@
 \usage{
 optim_tdv_hill_climb(
   m_bin,
-  p_initial = "random",
   k,
+  p_initial = "random",
   n_runs = 1,
   n_sol = 1,
   maxit = 10,
@@ -24,21 +24,21 @@ optim_tdv_hill_climb(
 (presences), where rows correspond to taxa and columns correspond to
 relevés.}
 
+\item{k}{A numeric giving the number of desired groups.}
+
 \item{p_initial}{A vector or a character. A vector of integer numbers
 with the initial partition of the relevés (i.e., a vector with values from
 1 to \code{k}, with length equal to the number of columns of \code{m_bin}, ascribing
 each relevé to one of the \code{k} groups). By default, \code{p_initial = "random"},
 generates a random initial partition.}
 
-\item{k}{A numeric giving the number of desired groups.}
-
 \item{n_runs}{A numeric giving the number of runs to perform.}
 
 \item{n_sol}{A numeric giving the number of best solutions to keep
 in the final output. Defaults to 1.}
 
-\item{maxit}{A numeric giving the number of iterations of the
-Hill-climbing optimization.}
+\item{maxit}{A numeric giving the number of iterations of the Hill-climbing
+optimization.}
 
 \item{min_g_size}{A numeric. The minimum number of relevés that a group can
 contain (must be 1 or higher).}
@@ -54,8 +54,8 @@ n-neighbours for the Stochastic Hill-climbing; only used if
 \code{stoch_first = TRUE}. Defaults to 1.}
 
 \item{stoch_maxit}{A numeric giving the number of iterations of the
-Hill-climbing optimization; only used if \code{stoch_first = TRUE}. Defaults
-to 100.}
+Stochastic Hill-climbing optimization; only used if \code{stoch_first = TRUE}.
+Defaults to 100.}
 
 \item{full_output}{A logical. If \code{FALSE} (the default) the best \code{n_sol}
 partitions and respective indices are returned. If \code{TRUE} (only available
@@ -85,13 +85,13 @@ containing also a list with the following components:
 \describe{
 \item{res.stoch}{A matrix with the iteration number (of the Stochastic
 Hill-climbing phase), the maximum TDV found until that iteration, and the
-higher TDV among all 1-neighbours.}
+TDV of the randomly selected n-neighbour in that iteration.}
 \item{par.stoch}{A vector with the best partition found in the Stochastic
 Hill-climbing phase.}
 \item{tdv.stoch}{A numeric showing the maximum TDV found in the
 Stochastic Hill-climbing phase (if selected).}
 \item{res}{A matrix with the iteration number (of the Hill-climbing), the
-maximum TDV found until that iteration, and the higher TDV among all
+maximum TDV found until that iteration, and the highest TDV among all
 1-neighbours.}
 \item{local_maximum}{A logical indicating if \code{par} is a 1-neighbour local
 maximum.}
@@ -123,12 +123,12 @@ is obtained, equivalently, ascribing n relevés to different groups.
 
 Optionally, a faster search (Stochastic Hill-climbing) can be performed in
 a first step (\code{stoch_first = TRUE}), consisting on searching for TDV
-improvements, by randomly selecting n-neighbours (n defined by the user
-with the parameter \code{stoch_neigh_size}), accepting that neighbour partition
-as a better solution if it improves TDV. This is repeated until a given
-number of maximum iterations (\code{stoch_maxit}) is reached. Stochastic
-Hill-climbing might be helpful for big tables (where the simple screening
-of all 1-neighbours might be too time consuming).
+improvements, by randomly selecting, in each iteration, one n-neighbour (n
+defined by the user in the parameter \code{stoch_neigh_size}), accepting that
+n-neighbour partition as a better solution if it improves TDV. This is
+repeated until a given number of maximum iterations (\code{stoch_maxit}) is
+reached. Stochastic Hill-climbing might be helpful for big tables (where
+the screening of all 1-neighbours might be too time consuming).
 
 Several runs of this function (i.e., multiple starts) should be
 tried out, as several local maxima are usually present and the

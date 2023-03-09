@@ -23,7 +23,7 @@ geobotanical) approach. The Gurobi optimizer, as well as the R package
 can be found here:
 <https://prioritizr.net/articles/gurobi_installation_guide.html>.
 
-## Acknowledgments
+## Acknowledgements
 
 TMH was funded by the European Social Fund (POCH and NORTE 2020) and by
 National Funds (MCTES), through a FCT – Fundação para a Ciência e a
@@ -48,5 +48,5 @@ Península Ibérica. Finisterra LVI(117): 127–150. DOI:
 You can install the development version of the package from GitLab.
 
 ``` r
-devtools::install_git("https://gitlab.com/point-veg/diffval")
+remotes::install_gitlab("point-veg/diffval")
 ```

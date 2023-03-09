@@ -6,17 +6,17 @@
 #' @param m_bin A matrix. A phytosociological table of 0s (absences) and 1s
 #'   (presences), where rows correspond to taxa and columns correspond to
 #'   relevés.
+#' @param k A numeric giving the number of desired groups.
 #' @param p_initial A vector or a character. A vector of integer numbers
 #'   with the initial partition of the relevés (i.e., a vector with values from
 #'   1 to `k`, with length equal to the number of columns of `m_bin`, ascribing
 #'   each relevé to one of the `k` groups). By default, `p_initial = "random"`,
 #'   generates a random initial partition.
-#' @param k A numeric giving the number of desired groups.
 #' @param n_runs A numeric giving the number of runs to perform.
 #' @param n_sol A numeric giving the number of best solutions to keep
 #'   in the final output. Defaults to 1.
-#' @param maxit A numeric giving the number of iterations of the
-#'   Hill-climbing optimization.
+#' @param maxit A numeric giving the number of iterations of the Hill-climbing
+#'   optimization.
 #' @param min_g_size A numeric. The minimum number of relevés that a group can
 #'   contain (must be 1 or higher).
 #' @param stoch_first A logical. `FALSE` (the default), performs only
@@ -28,8 +28,8 @@
 #'   n-neighbours for the Stochastic Hill-climbing; only used if
 #'   `stoch_first = TRUE`. Defaults to 1.
 #' @param stoch_maxit A numeric giving the number of iterations of the
-#'   Hill-climbing optimization; only used if `stoch_first = TRUE`. Defaults
-#'   to 100.
+#'   Stochastic Hill-climbing optimization; only used if `stoch_first = TRUE`.
+#'   Defaults to 100.
 #' @param full_output A logical. If `FALSE` (the default) the best `n_sol`
 #'   partitions and respective indices are returned. If `TRUE` (only available
 #'   for `n_sol = 1`) the output will also contain information on the
@@ -56,12 +56,12 @@
 #'
 #'   Optionally, a faster search (Stochastic Hill-climbing) can be performed in
 #'   a first step (`stoch_first = TRUE`), consisting on searching for TDV
-#'   improvements, by randomly selecting n-neighbours (n defined by the user
-#'   with the parameter `stoch_neigh_size`), accepting that neighbour partition
-#'   as a better solution if it improves TDV. This is repeated until a given
-#'   number of maximum iterations (`stoch_maxit`) is reached. Stochastic
-#'   Hill-climbing might be helpful for big tables (where the simple screening
-#'   of all 1-neighbours might be too time consuming).
+#'   improvements, by randomly selecting, in each iteration, one n-neighbour (n
+#'   defined by the user in the parameter `stoch_neigh_size`), accepting that
+#'   n-neighbour partition as a better solution if it improves TDV. This is
+#'   repeated until a given number of maximum iterations (`stoch_maxit`) is
+#'   reached. Stochastic Hill-climbing might be helpful for big tables (where
+#'   the screening of all 1-neighbours might be too time consuming).
 #'
 #'   Several runs of this function (i.e., multiple starts) should be
 #'   tried out, as several local maxima are usually present and the
@@ -93,13 +93,13 @@
 #'   \describe{
 #'     \item{res.stoch}{A matrix with the iteration number (of the Stochastic
 #'     Hill-climbing phase), the maximum TDV found until that iteration, and the
-#'     higher TDV among all 1-neighbours.}
+#'     TDV of the randomly selected n-neighbour in that iteration.}
 #'     \item{par.stoch}{A vector with the best partition found in the Stochastic
 #'     Hill-climbing phase.}
 #'     \item{tdv.stoch}{A numeric showing the maximum TDV found in the
 #'     Stochastic Hill-climbing phase (if selected).}
 #'     \item{res}{A matrix with the iteration number (of the Hill-climbing), the
-#'     maximum TDV found until that iteration, and the higher TDV among all
+#'     maximum TDV found until that iteration, and the highest TDV among all
 #'     1-neighbours.}
 #'     \item{local_maximum}{A logical indicating if `par` is a 1-neighbour local
 #'     maximum.}
@@ -157,8 +157,8 @@
 #'
 #' @export
 optim_tdv_hill_climb <- function(m_bin,
-                                 p_initial = "random",
                                  k,
+                                 p_initial = "random",
                                  n_runs = 1,
                                  n_sol = 1,
                                  maxit = 10,
@@ -354,6 +354,7 @@ optim_tdv_hill_climb <- function(m_bin,
     } else {
       loc_max <- FALSE
       p_curr <- p_ini
+
       # curr_val is already calculated (during or before the Stochastic
       # Hill-climbing)
       if (full_output == TRUE) {
@@ -383,6 +384,13 @@ optim_tdv_hill_climb <- function(m_bin,
         if (neig_val > curr_val) {
           p_curr <- p_neig
           curr_val <- neig_val
+          ofda <- temp$ofda
+          ifp <- temp$ifp
+          afg <- temp$afg
+          empty_size <- temp$empty_size
+          gct <- temp$gct
+          i_mul <- temp$i_mul
+          dv <- temp$dv
         } else {
           loc_max <- TRUE
           if (full_output == TRUE) {
