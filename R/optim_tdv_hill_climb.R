@@ -44,36 +44,49 @@
 #'   using a Hill-climbing algorithm, for patterns of differential taxa by
 #'   rearranging the relevés into `k` groups.
 #'
-#'   Optimization can start from a random partition (`p_ini = "random"`), or
+#'   The optimization can start from a random partition (`p_ini = "random"`), or
 #'   from a given partition (`p_ini`, defined by the user or produced by any
 #'   clustering method, or even a manual classification of the relevés).
 #'
-#'   Each iteration searches for a TDV improvement screening all 1-neighbours,
-#'   until the given number of maximum iterations (`maxit`) is reached. A
-#'   1-neighbour of a given partition is another partition obtained by changing
-#'   1 relevé (of the original partition) to a different group. A n-neighbour
-#'   is obtained, equivalently, ascribing n relevés to different groups.
+#'   In the description given below, a 1-neighbour of a given partition is
+#'   another partition that can be obtained by simply changing one relevé to a
+#'   different group. Equivalently a  `n`-neighbour of a given partition is
+#'   another partition obtained ascribing `n` relevés to different groups.
 #'
-#'   Optionally, a faster search (Stochastic Hill-climbing) can be performed in
-#'   a first step (`stoch_first = TRUE`), consisting on searching for TDV
-#'   improvements, by randomly selecting, in each iteration, one n-neighbour (n
-#'   defined by the user in the parameter `stoch_neigh_size`), accepting that
-#'   n-neighbour partition as a better solution if it improves TDV. This is
-#'   repeated until a given number of maximum iterations (`stoch_maxit`) is
-#'   reached. Stochastic Hill-climbing might be helpful for big tables (where
-#'   the screening of all 1-neighbours might be too time consuming).
+#'   This function implements a Hill-climbing algorithm, where a TDV improvement
+#'   is searched in each iteration, screening all 1-neighbours, until the given
+#'   number of maximum iterations (`maxit`) is reached. If `maxit` is not
+#'   reached but no TDV improvement is possible among all the 1-neighbours of
+#'   the currently best partition, the search is halted and the current
+#'   partition is tagged as a local maximum and outputted.
 #'
-#'   Several runs of this function (i.e., multiple starts) should be
-#'   tried out, as several local maxima are usually present and the
-#'   Hill-climbing algorithm converges easily to local maxima.
+#'   As the screening of all 1-neighbours might be computationally heavy,
+#'   specially while analysing big tables, optionally, a Stochastic
+#'   Hill-climbing search can be performed as a first step
+#'   (`stoch_first = TRUE`). This consists in searching for TDV improvements, by
+#'   randomly selecting, in each iteration, one `n`-neighbour (`n` defined by
+#'   the user in the parameter `stoch_neigh_size`), and accepting that
+#'   `n`-neighbour partition immediately if it improves TDV. This is repeated
+#'   until a given number of iterations (`stoch_maxit`) is reached. Specially
+#'   while starting from random partitions, Stochastic Hill-climbing is intended
+#'   to increase TDV without the computational burden of the full neighbourhood
+#'   screening, which can be done afterwards, in a second step.
+#'
+#'   The Hill-climbing or the combination of Stochastic Hill-climbing +
+#'   Hill-climbing, can be run multiple times by the function (defined in
+#'   `n_runs`), which consists in a Random-restart Hill-climbing, where `n_sol`
+#'   best solutions are kept and returned.
+#'
+#'   As the Hill-climbing algorithm converges easily to local maxima, several
+#'   runs of the function (i.e., multiple random starts) are advised.
 #'
 #'   Trimming your table by a 'constancy' range or using the result of other
 #'   cluster methodologies as input, might help finding interesting partitions.
-#'   Specially after trimming the table by a 'constancy' range, getting a random
-#'   initial partition with TDV greater than zero might be unlikely; on such
+#'   However, after trimming the table by a narrow 'constancy' range, getting a
+#'   random initial partition with TDV greater than zero might be hard; on such
 #'   cases using a initial partition from [partition_tdv_grasp()] or
-#'   [partition_tdv_grdtp()] (or even the result of other clustering
-#'   strategies) as an input partition might be useful.
+#'   [partition_tdv_grdtp()], or even the result of other clustering
+#'   strategies, as an input partition might be useful.
 #'
 #' @return If `full_output = FALSE`, a list with (at most) `n_sol` best
 #'   solutions (equivalent solutions are removed). Each best solution is also
@@ -188,9 +201,9 @@ optim_tdv_hill_climb <- function(m_bin,
   ns <- ncol(mt) # No. of taxa
   if (nr <= mgs * k) {
     stop(paste0(
-      "Random partition cannot guarantee at least ",
+      "A partition cannot guarantee at least ",
       mgs,
-      " relev\u00e9s per group!"
+      " relev\u00e9s per group (or only exactly)!"
     ))
   }
 
@@ -198,11 +211,13 @@ optim_tdv_hill_climb <- function(m_bin,
     p_ini <- p_initial
     if (!identical(as.integer(sort(unique(p_ini))), 1:k)) { # maybe when
       # p_initial is given k could be ignored
-      stop("Object `p` is not a valid partition of the columns of m.")
+      stop(
+        "Object `p_initial` is not a valid partition of the columns of `m_bin`"
+      )
     }
     if (!identical(length(p_ini), nr)) {
       stop(
-        "Object `p_ini` must be a partition of the columns of matrix `m_bin`."
+        "Object `p_initial` must be a partition of the columns of `m_bin`."
       )
     }
     tp <- tabulate(p_ini) # size of each group (inner)

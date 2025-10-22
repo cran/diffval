@@ -16,8 +16,8 @@
 #'   a k-partition, consisting in a vector with values from 1 to k, with length
 #'   equal to the number of relevés in `phyto_list`, ascribing each relevé to
 #'   one of the k groups).
-#' @param n_rel The number of relevés in the `phyto_list`, obtained e.g.
-#'   with `length(unique(unlist(phyto_list)))`.
+#' @param n_rel The number of relevés in `phyto_list`, obtained, for
+#'   example, using the instruction `length(unique(unlist(phyto_list)))`.
 #' @param output_type A character determining the amount of information returned
 #'   by the function and also the amount of pre-validations. Possible values are
 #'   "normal" (the default) and "fast".
@@ -102,7 +102,7 @@ bigdata_tdv <- function(phyto_list,
   if (output_type == "fast") {
     k <- max(p)
   } else {
-    stopifnot(is.list(phyto_list))
+    stopifnot("`phyto_list` must be a list." = is.list(phyto_list))
     rel_ids <- sort(unique(unlist(phyto_list)))
     if (!identical(as.integer(n_rel), length(rel_ids))) {
       stop("`nrel` is not matching the number of relev\u00e9s in `phyto_list`.")
@@ -164,7 +164,6 @@ bigdata_tdv <- function(phyto_list,
         d = d,
         mc.cores = mc_cores
       )
-      result <- unlist(result)
     } else {
       result <- lapply(
         phyto_list,
